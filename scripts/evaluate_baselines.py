@@ -7,6 +7,7 @@ to LiDAR, never to ground truth, since ground truth is unavailable at test time.
 """
 import argparse
 import csv
+import json
 from pathlib import Path
 
 import cv2
@@ -78,6 +79,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data", type=Path, default=DATA)
+    parser.add_argument("--split", help="Only score videos listed in splits/<split>.txt (e.g. test)")
     parser.add_argument("--limit", type=int, help="Evaluate at most this many samples")
     parser.add_argument("--csv", type=Path, help="Also write per-sample metrics to this CSV")
     args = parser.parse_args()
@@ -86,6 +88,12 @@ def main():
     names = sorted(p.name for p in (args.data / "annotations").glob("*")
                    if (p / "ground_truth.png").is_file()
                    and all((args.data / "images" / p.name / n).is_file() for n in INPUTS))
+    if args.split:
+        root = Path(__file__).resolve().parents[1]
+        videos = set((root / "splits" / f"{args.split}.txt").read_text().split())
+        raw = args.data.parent / "raw"
+        names = [n for n in names
+                 if json.loads((raw / n / "sample.json").read_text())["video_id"] in videos]
     if args.limit:
         names = names[:args.limit]
     if not names:
