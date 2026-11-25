@@ -11,3 +11,31 @@ python3 -m pip install -r requirements.txt
 python3 scripts/download_data.py --count 1000
 python3 scripts/process_data.py
 ```
+
+## Train/val/test split
+
+`scripts/make_split.py` assigns whole videos to train, val, or test (about 70/15/15 by sample count), so frames of the same room never appear in more than one split. It writes one video ID per line to `splits/train.txt`, `splits/val.txt`, and `splits/test.txt`. The split is committed so everyone uses the same one; rerun only if the downloaded videos change.
+
+```bash
+python3 scripts/make_split.py
+```
+
+## Baselines
+
+`scripts/evaluate_baselines.py` scores each depth source against the FARO ground truth: upsampled LiDAR, stereo, raw Depth Anything, and Depth Anything aligned to the LiDAR with a per-image scale (and scale + shift). It prints AbsRel, RMSE, δ<1.25, and coverage (the share of ground-truth pixels a method fills), averaged over samples.
+
+```bash
+python3 scripts/evaluate_baselines.py --split test            # test videos only
+python3 scripts/evaluate_baselines.py --csv results.csv       # also save per-sample metrics
+```
+
+## Loading data for training
+
+`scripts/dataset.py` is imported by training code, not run directly. It returns each processed sample in a split as tensors at 320×240: RGB, Depth Anything, LiDAR, stereo, and ground truth (depths in meters, 0 where missing), plus a validity mask for LiDAR, stereo, and ground truth.
+
+```python
+from dataset import DepthFusionDataset
+train = DepthFusionDataset("train", augment=True)        # random flips
+test = DepthFusionDataset("test", lidar_points=500)      # simulate a sparse LiDAR
+loader = torch.utils.data.DataLoader(train, batch_size=8, shuffle=True)
+```
