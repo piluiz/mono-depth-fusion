@@ -1,0 +1,13 @@
+# Data processing (scripts/process_data.py)
+numpy>=2.0
+scipy>=1.13
+opencv-python
+tqdm
+# process_data.py imports rerun.experimental.RrdReader, a deprecated alias that a
+# future release removes. Pinned to the tested version until the import is updated.
+rerun-sdk==0.44.*
+
+# Depth Anything V2 and RAFT-Stereo (data_processing_models/)
+torch>=2.2
+torchvision
+opt_einsum         # RAFT-Stereo correlation
