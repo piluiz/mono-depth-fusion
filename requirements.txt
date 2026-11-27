@@ -11,3 +11,7 @@ rerun-sdk==0.44.*
 torch>=2.2
 torchvision
 opt_einsum         # RAFT-Stereo correlation
+
+# Training run configuration and loss plots
+PyYAML
+matplotlib

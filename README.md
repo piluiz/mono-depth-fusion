@@ -14,7 +14,7 @@ python3 scripts/process_data.py
 
 ## Train/val/test split
 
-`scripts/make_split.py` assigns whole videos to train, val, or test (about 70/15/15 by sample count), so frames of the same room never appear in more than one split. It writes one video ID per line to `splits/train.txt`, `splits/val.txt`, and `splits/test.txt`. The split is committed so everyone uses the same one; rerun only if the downloaded videos change.
+`scripts/make_split.py` assigns whole videos to train, val, or test (about 70/15/15 by sample count), so frames of the same room never appear in more than one split. It writes one video ID per line to `splits/train.txt`, `splits/val.txt`, and `splits/test.txt`. Run the command below after downloading the data to generate the split files locally. The same data and seed reproduce the same split.
 
 ```bash
 python3 scripts/make_split.py
